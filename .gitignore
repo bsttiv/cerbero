@@ -1,0 +1,14 @@
+obj/
+bin/
+*.o
+*.out
+*.exe
+*.a
+*.so
+cerbero
+*.gcov
+*.gcda
+*.gcno
+gmon.out
+vgcore.*
+callgrind.out.*
