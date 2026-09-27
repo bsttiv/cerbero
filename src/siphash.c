@@ -14,8 +14,8 @@ void init_siphash(u64 *vo, u64 *v1, u64 *v2, u64 *v3, u8 *key) {
 u64 siphash(u8 *key, u8 *m, unsigned long b) {
   u64 v0, v1, v2, v3;
   init_siphash(&v0, &v1, &v2, &v3, key);
-  int blocks = b / 8;
-  int remainder = b % 8;
+  size_t blocks = b / 8;
+  size_t remainder = b % 8;
   for (size_t i = 0; i < blocks; i++) {
     u64 mi;
     memcpy(&mi, m + i * 8, 8);

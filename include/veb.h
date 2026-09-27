@@ -14,8 +14,10 @@ typedef struct vEBNode {
   int capacity;
   struct vEBNode *top;
   HashTable *bottom;
+  u8 *secret_key;
 } vEBNode;
 
-vEBNode *veb_create(u8 capacity);
+vEBNode *veb_create(u8 capacity, u8 *secret_key);
 void veb_insert(vEBNode *veb, u32 x);
 bool veb_contains(vEBNode *veb, u32 x);
+void veb_destroy(vEBNode *veb);

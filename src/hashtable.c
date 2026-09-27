@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/random.h>
 #include <sys/types.h>
 
 void hashtable_resize(HashTable *ht) {
@@ -31,19 +30,13 @@ void hashtable_resize(HashTable *ht) {
   }
 }
 
-void generate_key(u8 secret_key[16]) {
-  ssize_t result;
-  do {
-    result = getrandom(secret_key, 16, 0);
-  } while (result != 16);
-}
-
-HashTable *hashtable_create(int capacity, u8 children_cluster_size) {
+HashTable *hashtable_create(int capacity, u8 children_cluster_size,
+                            u8 *siphash_key) {
   HashTable *ht = malloc(sizeof(HashTable));
   ht->capacity = capacity;
+  ht->secret_key = siphash_key;
   ht->children_cluster_size = children_cluster_size;
   ht->size = 0;
-  generate_key(ht->secret_key);
   ht->table = calloc(capacity, sizeof(HashEntry));
   return ht;
 }
@@ -65,7 +58,6 @@ void hashtable_insert(HashTable *ht, u64 key, vEBNode *cluster) {
 }
 
 vEBNode *hashtable_get(HashTable *ht, u64 key) {
-  hashtable_resize(ht);
   u64 hash = siphash(ht->secret_key, (u8 *)&key, 8);
   u64 index = hash % ht->capacity;
   while (ht->table[index].cluster != NULL) {
@@ -85,9 +77,28 @@ vEBNode *hashtable_get_or_create(HashTable *ht, u64 key) {
       return ht->table[index].cluster;
     index = (index + 1) % ht->capacity;
   }
-  vEBNode *node = veb_create(ht->children_cluster_size);
+  vEBNode *node = veb_create(ht->children_cluster_size, ht->secret_key);
   ht->table[index].key = key;
   ht->table[index].cluster = node;
   ht->size++;
   return node;
+}
+
+void hashtable_destroy(HashTable *ht) {
+  if (ht == NULL) {
+    return;
+  }
+
+  if (ht->table != NULL) {
+    for (int i = 0; i < ht->capacity; i++) {
+      if (ht->table[i].cluster != NULL) {
+        veb_destroy(ht->table[i].cluster);
+        ht->table[i].cluster = NULL;
+      }
+    }
+    free(ht->table);
+    ht->table = NULL;
+  }
+
+  free(ht);
 }
