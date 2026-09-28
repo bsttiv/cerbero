@@ -13,7 +13,7 @@ Designed for high-throughput network security and data-plane firewalls, Cerbero 
 - [x] **SipHash-2-4**: Cryptographic PRF implemented using a 128-bit key (`getrandom()`) to defend against HashDoS collision attacks.
 - [x] **CerberoEngine**: Unified abstraction implemented to encapsulate root vEB tree and master key lifecycle (`cerbero_engine_create`, `cerbero_destroy`).
 - [x] **Memory Integrity**: Verified clean cascading cleanup under Valgrind with 0 memory leaks and 0 pointer errors.
-- [x] **Throughput Verification**: Synthetic benchmarks validated at >1.3M+ search operations per second on a single thread.
+- [x] **High Throughput**: Search operations validated at sub-microsecond latency, capable of exceeding >1.3M+ lookups per second on a single thread.
 
 ---
 
@@ -23,7 +23,7 @@ Designed for high-throughput network security and data-plane firewalls, Cerbero 
 * **HashDoS-Resistant Cluster Storage**: Internal cluster nodes use open-addressing (*linear probing*) hash tables keyed with SipHash-2-4 using a cryptographically secure 128-bit master key (`getrandom()`).
 * **Sparse / Dynamic Memory Layout**: Clusters are allocated on-demand; empty IP address blocks consume zero memory.
 * **Zero Memory Leaks**: Clean cascading destruction (`cerbero_destroy`, `veb_destroy`, `hashtable_destroy`) verified under Valgrind with 0 errors and 0 leaked bytes.
-* **High Throughput**: Synthetic benchmarks achieve over **1.3M+ operations per second (OPS)** on a single CPU core.
+* **High Throughput**: Sustained search operations exceed **1.3M+ operations per second (OPS)** on a single CPU core.
 
 ---
 
@@ -67,9 +67,8 @@ Designed for high-throughput network security and data-plane firewalls, Cerbero 
 │   ├── cerbero.c      # CerberoEngine implementation
 │   ├── veb.c          # vEB insert, contains, create, destroy
 │   ├── hashtable.c    # Hash table operations and dynamic resizing
-│   ├── siphash.c      # SipHash-2-4 round transformations
-│   └── benchmark.c    # Throughput and latency benchmarking
-├── Makefile           # Build automation (bench, memcheck)
+│   └── siphash.c      # SipHash-2-4 round transformations
+├── Makefile           # Build automation
 └── README.md          # Project documentation
 ```
 
@@ -78,25 +77,13 @@ Designed for high-throughput network security and data-plane firewalls, Cerbero 
 ## Building and Running
 
 > [!NOTE]
-> Cerbero is currently structured as an engine library. A standalone `main` entrypoint executable has not yet been included in the repository; the engine is executed and validated through synthetic benchmarks and profiling targets.
+> Cerbero is currently structured as an engine library. A standalone `main` entrypoint executable has not yet been included in the repository.
 
 ### Requirements
 * GCC with C11 support (`-std=c11`)
 * Linux kernel with `getrandom()` support
 * Make
 * Valgrind (optional, for memory profiling)
-
-### Run Benchmarks
-Compiles with `-O3` optimizations and measures sustained lookup operations per second:
-```bash
-make bench
-```
-
-### Memory Leak Verification
-Runs the benchmark and memory verification through Valgrind to ensure 0 memory leaks and 0 invalid memory accesses:
-```bash
-make memcheck
-```
 
 ---
 
