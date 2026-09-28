@@ -77,6 +77,9 @@ Designed for high-throughput network security and data-plane firewalls, Cerbero 
 
 ## Building and Running
 
+> [!NOTE]
+> Cerbero is currently structured as an engine library. A standalone `main` entrypoint executable has not yet been included in the repository; the engine is executed and validated through synthetic benchmarks and profiling targets.
+
 ### Requirements
 * GCC with C11 support (`-std=c11`)
 * Linux kernel with `getrandom()` support
