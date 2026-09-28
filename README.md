@@ -106,6 +106,7 @@ make memcheck
 - **Zero-Copy / Syscall Kernel Bypass Packet Scanning**: Native integration of shared-memory ring buffers (`PACKET_MMAP` / AF_XDP) directly into the engine core, eliminating `recvfrom` syscalls and memory copies for line-rate packet ingestion.
 - **Multi-Threading via Kernel `PACKET_FANOUT`**: Distribute network traffic across CPU cores using socket fanout (`PACKET_FANOUT_HASH` / `PACKET_FANOUT_CPU`), where each worker thread maintains a dedicated zero-copy ring buffer to scale throughput linearly without lock contention.
 - **Read-Write Locking (RWLock) for Dynamic Rule Updates**: Implement a thread-safe Reader-Writer Lock around the van Emde Boas tree, allowing concurrent zero-overhead read searches (`veb_contains`) while safely supporting live dynamic IP blacklist insertions and removals in real time without pausing traffic.
+- **Control Plane Socket for Dynamic Blacklist Updates**: Introduce a dedicated control-plane socket (e.g., Unix Domain Socket) to receive new IPs and CIDRs dynamically from external monitoring tools, orchestrators, or administrators at runtime without restarting the engine.
 - **Performance Metrics & Statistics Export**: Provide mechanisms to export operational statistics and performance metrics (e.g., packet throughput, drop rates, and bandwidth) for monitoring and post-run analysis.
 
 ---
